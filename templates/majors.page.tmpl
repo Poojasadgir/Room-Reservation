@@ -1,0 +1,115 @@
+{{template "base" .}}
+
+{{define "content"}}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <img src="/static/images/majors-suite.jpg" class="img-fluid img-thumbnail mx-auto d-block room-image"
+                alt="room image" />
+            <p class="text-center">Photo by <a
+                    href="https://unsplash.com/@fromitaly?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Francesca
+                    Tosolini</a> on <a
+                    href="https://unsplash.com/s/photos/master-bathroom?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center mt-4">Welcome to Fort Oak Bed and Breakfast</h1>
+            <p class="text-center mt-4">Your home away from home. This will be a vacation
+                to remember</p>
+            <p>The room features a comfortable queen-sized bed with plush bedding, perfect for a good night's sleep. The walls are adorned with wood paneling, giving the room a warm and inviting ambiance.
+
+The room is modestly sized, with just enough space for a small table and chairs in the corner, where guests can enjoy a cup of coffee or a light snack. A wooden dresser provides ample storage for clothes and personal belongings.
+
+The private bathroom is located just outside the room and includes a shower, sink, and toilet. While not overly spacious, the bathroom is clean and well-maintained, with fresh towels and toiletries provided.
+
+Overall, this room is perfect for guests who value comfort and affordability over luxury amenities. It offers a peaceful and relaxing retreat from the hustle and bustle of everyday life, with a charming and homey atmosphere that is sure to make guests feel right at home.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col text-center">
+            <a id="check-availability-button" href="#!" class="btn btn-success">Check
+                Availability</a>
+        </div>
+    </div>
+</div>
+
+{{end}}
+
+{{define "js"}}
+<script>
+    document.getElementById("check-availability-button").addEventListener("click", function () {
+        let html = `
+<form id="check-availability-form" action="" method="post" novalidate class="needs-validation"  autocomplete="off">
+    <div class="form-row">
+        <div class="col">
+            <div class="form-row" id="reservation-dates-modal">
+                <div class="col">
+                    <input disabled required class="form-control" type="text" name="start" id="start" placeholder="Arrival">
+                </div>
+                <div class="col">
+                    <input disabled required class="form-control" type="text" name="end" id="end" placeholder="Departure">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+`
+        attention.custom({
+            message: html,
+            title: "Choose your dates",
+
+            willOpen: () => {
+                const elem = document.getElementById('reservation-dates-modal');
+                const rp = new DateRangePicker(elem, {
+                    format: 'yyyy-mm-dd',
+                    showOnFocus: true,
+                    minDate: new Date(),
+                })
+            },
+
+            didOpen: () => {
+                document.getElementById('start').removeAttribute('disabled');
+                document.getElementById('end').removeAttribute('disabled');
+            },
+
+            callback: function (result) {
+                let form = document.getElementById("check-availability-form");
+                let formData = new FormData(form);
+                formData.append("csrf_token", "{{.CSRFToken}}");
+                formData.append("room_id", "2");
+
+                fetch('/search-availability-json', {
+                    method: "post",
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.ok) {
+                            attention.custom({
+                                icon: 'success',
+                                showConfirmButton: false,
+                                message: '<p>Room is available!</p>'
+                                    + '<p><a href="/book-room?id='
+                                    + data.room_id
+                                    + '&s='
+                                    + data.start_date
+                                    + '&e='
+                                    + data.end_date
+                                    + '" class="btn btn-primary">'
+                                    + 'Book now!</a></p>',
+                            });
+                        }
+                        else {
+                            attention.error({
+                                message: "No availability",
+                            });
+                        }
+                    })
+            }
+        });
+    })
+</script>
+{{end}}

@@ -1,0 +1,116 @@
+{{template "base" .}}
+
+{{define "content"}}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <img src="/static/images/generals-quarters.jpg" class="img-fluid img-thumbnail mx-auto d-block room-image"
+                 alt="room image" />
+            <p class="text-center">Photo by <a
+                    href="https://unsplash.com/@fromitaly?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Francesca
+                    Tosolini</a> on <a
+                    href="https://unsplash.com/s/photos/master-bathroom?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center mt-4">Welcome to Fort Oak Bed and Breakfast</h1>
+            <p class="text-center mt-4">Your home away from home. This will be a vacation to remember</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eget varius mi. Pellentesque nec
+                vulputate lacus, vel tempus felis. Etiam tempor sollicitudin felis eu sollicitudin. Praesent
+                auctor purus ligula, sit amet malesuada ex luctus et. In sagittis ornare egestas. Maecenas nisi
+                arcu, ornare quis pretium vel, faucibus ac nisi. Cras vel sagittis lorem. Phasellus ut ex non
+                metus mollis dignissim ac in nisi. Proin at neque purus. Sed mattis, leo pretium mattis pretium,
+                magna tortor venenatis leo, id venenatis nunc erat sed nisi. Etiam ut semper ligula. Phasellus
+                venenatis vehicula felis eu eleifend. Suspendisse ut elit dictum, vestibulum erat gravida,
+                pulvinar erat. In eu diam sed enim molestie eleifend quis eu leo. Sed ut eros ut velit accumsan
+                vulputate. Cras scelerisque auctor metus, at cursus ex porta non.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col text-center">
+            <a id="check-availability-button" href="#!" class="btn btn-success">Check
+                Availability</a>
+        </div>
+    </div>
+</div>
+
+{{end}}
+
+{{define "js"}}
+<script>
+    document.getElementById("check-availability-button").addEventListener("click", function () {
+        let html = `
+<form id="check-availability-form" action="" method="post" novalidate class="needs-validation"  autocomplete="off">
+    <div class="form-row">
+        <div class="col">
+            <div class="form-row" id="reservation-dates-modal">
+                <div class="col">
+                    <input disabled required class="form-control" type="text" name="start" id="start" placeholder="Arrival">
+                </div>
+                <div class="col">
+                    <input disabled required class="form-control" type="text" name="end" id="end" placeholder="Departure">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+`
+        attention.custom({
+            message: html,
+            title: "Choose your dates",
+
+            willOpen: () => {
+                const elem = document.getElementById('reservation-dates-modal');
+                const rp = new DateRangePicker(elem, {
+                    format: 'yyyy-mm-dd',
+                    showOnFocus: true,
+                    minDate: new Date(),
+                })
+            },
+
+            didOpen: () => {
+                document.getElementById('start').removeAttribute('disabled');
+                document.getElementById('end').removeAttribute('disabled');
+            },
+
+            callback: function (result) {
+                let form = document.getElementById("check-availability-form");
+                let formData = new FormData(form);
+                formData.append("csrf_token", "{{.CSRFToken}}");
+                formData.append("room_id", "1");
+
+                fetch('/search-availability-json', {
+                    method: "post",
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.ok) {
+                            attention.custom({
+                                icon: 'success',
+                                showConfirmButton: false,
+                                message: '<p>Room is available!</p>'
+                                    + '<p><a href="/book-room?id='
+                                    + data.room_id
+                                    + '&s='
+                                    + data.start_date
+                                    + '&e='
+                                    + data.end_date
+                                    + '" class="btn btn-primary">'
+                                    + 'Book now!</a></p>',
+                            });
+                        }
+                        else {
+                            attention.error({
+                                message: "No availability",
+                            });
+                        }
+                    })
+            }
+        });
+    })
+</script>
+{{end}}

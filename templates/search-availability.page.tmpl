@@ -1,0 +1,46 @@
+{{template "base" .}}
+
+{{define "content"}}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <h1 class="mt-5">Search for availability</h1>
+            <form action="/search-availability" method="POST" class="needs-validation" novalidate autocomplete="off">
+                <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+                <div class="form-row">
+                    <div class="col">
+                        <div class="form-row" id="reservationDates">
+                            <div class="col">
+                                <input type="text" class="form-control" name="start" required
+                                    placeholder="Arrival Date">
+                            </div>
+                            <div class="col">
+                                <input type="text" class="form-control" name="end" required
+                                    placeholder="Departure Date">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <button type="submit" class="btn btn-primary">Search Availability</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{end}}
+
+{{define "js"}}
+
+<script>
+    // Custom date picker with the vanillajs-datepicker library 
+    const elem = document.getElementById('reservationDates');
+    const rangepicker = new DateRangePicker(elem, {
+        format: "yyyy-mm-dd",
+        minDate: new Date(),
+    });
+</script>
+
+{{end}}

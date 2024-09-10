@@ -1,0 +1,60 @@
+/* Carousel sizing */
+
+.carousel-caption {
+    width: auto;
+    padding: 10px;
+    height: auto;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37);
+    overflow: hidden;
+    border: 1px solid rgba( 255, 255, 255, 0.18);
+    color: black;
+}
+
+/* Carousel picture reference text */
+
+.reference {
+    font-size: 90%;
+}
+
+/* Footer styling */
+
+.my-footer {
+    background-color: #163b65;
+    margin-top: 1.5em;
+    padding: 1em;
+    color: white;
+    font-size: 80%;
+}
+
+/* Room pictures from Unsplash */
+
+.room-image {
+    max-width: 50%;
+}
+
+/* Unsplash picture reference styling */
+
+.room-reference {
+    align-items: center;
+}
+
+/* Notie notification styling */
+
+.notie-container {
+    box-shadow: none;
+}
+
+/* Custom Date Picker Styling */
+
+.datepicker {
+    z-index: 10000;
+}
+
+/* Navbar */
+
+.navmenu {
+    position: fixed !important;
+    z-index: 100;
+}
